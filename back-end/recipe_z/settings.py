@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
+    'guest_user',  # Add django-guest-user app
 ]
 
 MIDDLEWARE = [
@@ -122,47 +123,3 @@ AXES_LOCKOUT_CALLABLE = 'core.views.custom_lockout_response'
 # Use the custom user model
 AUTH_USER_MODEL = 'core.User'
 
-# Site ID (required by allauth)
-SITE_ID = 1
-
-# Authentication backends
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
-
-# Additional allauth settings
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
-# Provider-specific settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'METHOD': 'oauth2',
-        'VERIFIED_EMAIL': False,
-        'CLIENT_ID': os.getenv('GOOGLE_CLIENT_ID'),
-        'SECRET': os.getenv('GOOGLE_CLIENT_SECRET'),
-    },
-    'facebook': {
-        'METHOD': 'oauth2',
-        'SCOPE': [
-            'email',
-            'public_profile',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'VERIFIED_EMAIL': False,
-        'CLIENT_ID': os.getenv('FACEBOOK_CLIENT_ID'),
-        'SECRET': os.getenv('FACEBOOK_CLIENT_SECRET'),
-    }
-}
