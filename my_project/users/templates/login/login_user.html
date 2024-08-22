@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to Recipe-z</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/login.css' %}">
+    
+    <!-- Facebook SDK for JavaScript -->
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '389159887518720', // Replace with your Facebook App ID
+          xfbml      : true,
+          version    : 'v20.0'
+        });
+        FB.AppEvents.logPageView();
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Login to Your Account</h1>
+        
+        <div class="login-container">
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+            <form method="post" action="/api/login/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>        
+            <p>Don't have an account? <a href="{% url 'user-register' %}">Register here</a>.</p>
+            
+            <!-- Social Login Buttons -->
+            <div class="social-login-buttons">
+                <a href="{% url 'facebook_login' %}" class="social-login-button facebook-button">Login with Facebook</a>
+                <a href="{% url 'google_login' %}" class="social-login-button google-button">Login with Google</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
