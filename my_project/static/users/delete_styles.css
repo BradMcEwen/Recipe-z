@@ -1,57 +1,77 @@
-/* delete_styles.css */
-
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4; /* Optional: Background color for the entire page */
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    animation: fadeIn 0.5s ease;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
 }
 
 h1 {
-    font-size: 24px;
-    margin: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 20px;
-    margin-left: 20px; /* Adjusts distance from the left edge */
-    color: #333; /* Title color */
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
 }
 
-form {
-    max-width: 500px; /* Increased container width */
-    margin: 100px auto;
-    padding: 30px; /* Increased padding */
+.delete-container {
+    max-width: 400px;
+    width: 100%;
+    padding: 30px;
     background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Centering the content within the form */
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+}
+
+.form-group {
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    color: #555;
 }
 
 input[type="text"] {
-    width: 95%; /* Adjusted to fit within the new container size */
-    padding: 10px;
+    width: 100%;
+    padding: 12px;
     border-radius: 5px;
     border: 1px solid #ccc;
     box-sizing: border-box;
-    margin-bottom: 15px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #5cb85c;
+    outline: none;
+    background-color: #fff;
 }
 
 button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #d9534f;
     border: none;
     border-radius: 5px;
     color: white;
     font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
 }
 
 button:hover {
@@ -59,24 +79,27 @@ button:hover {
 }
 
 .alert {
-    padding: 10px;
-    margin-bottom: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
     border-radius: 5px;
+    color: white;
     text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .alert-danger {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: #d9534f;
 }
 
 .alert-success {
-    background-color: #dff0d8;
-    color: #3c763d;
+    background-color: #5cb85c;
 }
 
-p {
-    text-align: center;
-    margin-top: 20px;
-    color: #555;
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

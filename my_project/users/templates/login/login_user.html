@@ -14,11 +14,6 @@
             popup.style.display = 'block';
         }
 
-        function closePopup() {
-            var popup = document.getElementById('login-popup');
-            popup.style.display = 'none';
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             var message = "{{ message|escapejs }}"; // Escape JavaScript characters
             if (message) {
@@ -57,6 +52,11 @@
     </script>
 </head>
 <body>
+    <!-- Popup Message -->
+    <div id="login-popup" class="login-popup">
+        <p></p>
+    </div>
+
     <div class="container">
         <h1>Login to Your Account</h1>
         
@@ -81,12 +81,6 @@
             <!-- Add a logout button with an ID for JavaScript -->
             <button id="logout-button">Logout</button>
         </div>
-    </div>
-
-    <!-- Popup Message -->
-    <div id="login-popup" class="login-popup">
-        <p></p>
-        <button onclick="closePopup()">Close</button>
     </div>
 </body>
 </html>
