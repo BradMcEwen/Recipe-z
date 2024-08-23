@@ -2,7 +2,10 @@ import requests
 import os
 from dotenv import load_dotenv
 from mongoengine import connect
-from models import User
+from users.models import User
+
+
+
 
 # Load environment variables from .env file
 load_dotenv()
