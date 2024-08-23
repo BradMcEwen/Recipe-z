@@ -1,11 +1,6 @@
 from decouple import config
 from my_project.users.models import Token, User
 from mongoengine import connect
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
 
 # Load environment variables
 MONGODB_URI = config('MONGODB_URI')

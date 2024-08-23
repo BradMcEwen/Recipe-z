@@ -3,7 +3,8 @@ from django.urls import path, include
 from rest_framework.authtoken import views as drf_views
 from users.views import (
     UserRegister, 
-    UserLogin, 
+    UserLogin,
+    LogoutView,
     UserDeleteView, 
     home, 
     RecipeListCreateView, 
@@ -17,6 +18,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/', UserRegister.as_view(), name='user-register'),
     path('api/login/', UserLogin.as_view(), name='user-login'),
+    path('api/logout/', LogoutView.as_view(), name='user-logout'),
     path('api/facebook/login/', FacebookLogin.as_view(), name='facebook_login'),
     path('api/google/login/', GoogleLogin.as_view(), name='google_login'),
     path('facebook/callback/', FacebookLogin.as_view(), name='facebook_callback'),
