@@ -4,14 +4,13 @@ from mongoengine import (
     ObjectIdField, BooleanField, FloatField, signals
 )
 from bson import ObjectId
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import base64
 import os
 from gridfs import GridFS
 from django.conf import settings
 from .GridFS import MediaFile
 from my_project.settings import fs
-
 
 
 # Social Login Embedded Document
@@ -54,23 +53,26 @@ class User(Document):
         self.delete()  
 
 # Token Document for Authentication
+
 class Token(Document):
-    key = StringField(required=True, unique=True)  
-    user = ReferenceField(User, required=True)  
-    created = DateTimeField(default=datetime.now(timezone.utc))  
+    key = StringField(required=True, unique=True)
+    user = ReferenceField(User, required=True)
+    created = DateTimeField(default=datetime.now(timezone.utc))
 
     @classmethod
     def generate_token(cls, user):
         existing_token = Token.objects(user=user).first()
-        if existing_token:
+        if existing_token and not existing_token.is_expired():
             return existing_token
         new_token = Token(user=user)
         new_token.key = base64.urlsafe_b64encode(os.urandom(32)).decode('utf-8')
         new_token.save()
         return new_token
 
-    def is_expired(self):
-        return False
+    def is_expired(self, expiration_hours=2):
+        if self.created.tzinfo is None:
+            self.created = self.created.replace(tzinfo=timezone.utc)
+        return datetime.now(timezone.utc) > (self.created + timedelta(hours=expiration_hours))
 
     def __str__(self):
         return f"Token for {self.user.email}"

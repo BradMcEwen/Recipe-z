@@ -2,11 +2,6 @@ from decouple import config
 from datetime import datetime, timezone
 from mongoengine import connect
 from my_project.users.models import Recipe, Ingredient, IngredientAmount, Instruction, Media, MyPlate, User
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
 
 # Load environment variables
 MONGODB_URI = config('MONGODB_URI')

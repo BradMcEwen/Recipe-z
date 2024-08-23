@@ -6,25 +6,54 @@
     <title>Login to Recipe-z</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'users/login.css' %}">
-    
-    <!-- Facebook SDK for JavaScript -->
     <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '389159887518720', // Replace with your Facebook App ID
-          xfbml      : true,
-          version    : 'v20.0'
-        });
-        FB.AppEvents.logPageView();
-      };
+        // JavaScript to show popup message
+        function showPopup(message) {
+            var popup = document.getElementById('login-popup');
+            popup.querySelector('p').textContent = message;
+            popup.style.display = 'block';
+        }
 
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "https://connect.facebook.net/en_US/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-       }(document, 'script', 'facebook-jssdk'));
+        function closePopup() {
+            var popup = document.getElementById('login-popup');
+            popup.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var message = "{{ message|escapejs }}"; // Escape JavaScript characters
+            if (message) {
+                showPopup(message);
+            }
+
+            // Add event listener to the logout button
+            document.getElementById('logout-button').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}' // Add the CSRF token to the headers
+                    },
+                    credentials: 'include' // Include cookies in the request
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Logout failed');
+                    }
+                    return response.json(); // Assuming your server returns JSON
+                })
+                .then(data => {
+                    showPopup('Logout successful!');
+                    setTimeout(() => {
+                        window.location.href = '/api/login/'; // Redirect after logout
+                    }, 1000); // Wait 1 second before redirect
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
     </script>
 </head>
 <body>
@@ -48,13 +77,16 @@
                 <button type="submit">Login</button>
             </form>        
             <p>Don't have an account? <a href="{% url 'user-register' %}">Register here</a>.</p>
-            
-            <!-- Social Login Buttons -->
-            <div class="social-login-buttons">
-                <a href="{% url 'facebook_login' %}" class="social-login-button facebook-button">Login with Facebook</a>
-                <a href="{% url 'google_login' %}" class="social-login-button google-button">Login with Google</a>
-            </div>
+
+            <!-- Add a logout button with an ID for JavaScript -->
+            <button id="logout-button">Logout</button>
         </div>
+    </div>
+
+    <!-- Popup Message -->
+    <div id="login-popup" class="login-popup">
+        <p></p>
+        <button onclick="closePopup()">Close</button>
     </div>
 </body>
 </html>

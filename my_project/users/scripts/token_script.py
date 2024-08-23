@@ -1,10 +1,5 @@
 import requests
 from decouple import config
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
 
 # Load environment variables
 BASE_URL = config('BASE_URL')

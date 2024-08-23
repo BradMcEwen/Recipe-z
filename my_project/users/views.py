@@ -2,8 +2,9 @@ import logging
 from rest_framework import status, permissions, pagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authentication import BaseAuthentication
+from rest_framework.authentication import BaseAuthentication, TokenAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
 from .models import User, Recipe, Ingredient, Instruction, MyPlate, Token, Media, IngredientAmount, SocialLogin
 from .serializers import UserSerializer
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
@@ -22,9 +23,13 @@ from social_core.backends.facebook import FacebookOAuth2
 from social_core.exceptions import AuthException
 from django.contrib.auth import login
 import requests
-from dotenv import load_dotenv
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout as django_logout
+from django.utils.translation import gettext_lazy as _
 
-load_dotenv()
+
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User as DjangoUser  # Import Django's default User model for password checking
 
 
 
@@ -219,12 +224,29 @@ class GoogleLogin(APIView):
 
         return redirect('home')
 
+
 class UserLogin(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
+        # Check if the user is already logged in by checking the token in the cookie
+        token_key = request.COOKIES.get('auth_token')
+        if token_key:
+            try:
+                token = Token.objects.get(key=token_key)
+                user = token.user
+                if user:
+                    # User is already logged in
+                    return render(request, 'login/login_user.html', {
+                        'message': f"Welcome back, {user.name}! You are already logged in."
+                    })
+            except Token.DoesNotExist:
+                # Token not found
+                pass
+
+        # Render login page if not logged in
         return render(request, 'login/login_user.html')
-    
+
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -234,7 +256,6 @@ class UserLogin(APIView):
                 'error': "Email and password are required."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Fetch the user using MongoEngine
         user = User.objects(email=email).first()
         if not user:
             logger.error(f"Login failed for email: {email} (user not found)")
@@ -242,27 +263,21 @@ class UserLogin(APIView):
                 'error': "Invalid email or password."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check the password
-        if not check_password(password, user.password_hash):
+        # Check if the password is correct
+        if not self.check_password(password, user.password_hash):
             logger.error(f"Login failed for email: {email} (incorrect password)")
             return Response({
                 'error': "Invalid email or password."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate or retrieve the token
-        token = Token.generate_token(user)  # Ensure this method is correctly implemented
-        token_key = token.key  # Retrieve the key from the token
-
-        response = Response({
-            "message": "Login successful!",
-            "user": {
-                "id": str(user.id),
-                "name": user.name,
-                "email": user.email
-            }
-        }, status=status.HTTP_200_OK)
+        # Generate or get the existing token
+        token = Token.generate_token(user)
+        token_key = token.key
 
         # Set the authentication token in the cookie
+        response = render(request, 'login/login_user.html', {
+            'message': f"Login successful! Welcome, {user.name}."
+        })
         response.set_cookie(
             key='auth_token',
             value=token_key,
@@ -273,6 +288,39 @@ class UserLogin(APIView):
 
         logger.info(f"Login successful for user: {user.email}")
         return response
+
+    def check_password(self, plain_password, hashed_password):
+        """Check if the plain password matches the hashed password."""
+        # Use Django's password hashing method
+        return check_password(plain_password, hashed_password)
+    
+
+class LogoutView(APIView):
+    authentication_classes = [CookieTokenAuthentication]  # Use CookieTokenAuthentication instead of TokenAuthentication
+    permission_classes = [IsAuthenticated]
+
+    @csrf_exempt
+    def post(self, request, *args, **kwargs):
+        # Retrieve the token from cookies
+        token_key = request.COOKIES.get('auth_token')
+        if token_key:
+            # Use the CookieTokenAuthentication class to verify the token
+            try:
+                token = Token.objects.get(key=token_key)
+                if token and not token.is_expired():
+                    token.delete()  # Delete the token from the database
+                    response = Response({"detail": _("Successfully logged out.")}, status=status.HTTP_200_OK)
+                else:
+                    response = Response({"detail": _("Token is expired or invalid.")}, status=status.HTTP_400_BAD_REQUEST)
+            except Token.DoesNotExist:
+                response = Response({"detail": _("Invalid token.")}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            response = Response({"detail": _("Token not provided.")}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Remove the token from the cookies
+        response.delete_cookie('auth_token')
+        return response
+
 
 # Recipe Views
 
