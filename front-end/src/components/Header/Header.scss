@@ -1,0 +1,136 @@
+@import "../../App.scss";
+
+.navbar {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    height: 60px;
+    position: relative;
+    z-index: 999;
+    transition: $transition;
+
+    .navbar-brand-text {
+        margin-left: 5px;
+    }
+    .navbar-search-btn {
+        margin-right: 12px;
+    }
+}
+
+.scrolled {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.header {
+    .header-content {
+        height: 400px;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url("../../assets/images/header_image.jpg") center/cover no-repeat;
+    }
+    .header-title {
+        margin-top: 2.4rem;
+    }
+}
+
+.search-form {
+    .form-control-input {
+        box-shadow: 0 4px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(0 0 0 / 5%) inset;
+        min-width: 300px;
+        font-size: 16px;
+        height: 55px;
+        padding: 0px 3.2rem;
+        border-radius: 2.8rem !important;
+        margin-right: 1.2rem;
+        cursor: pointer; /* Makes it clear that clicking opens the modal */
+    }
+    .form-submit-btn {
+        width: 55px;
+        height: 55px;
+        background-color: $clr-orange;
+        border-radius: 50%;
+        position: relative;
+        transition: $transition;
+
+        .btn-icon {
+            transition: $transition;
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border: 1px solid $clr-white;
+            border-radius: 50%;
+        }
+
+        &:hover {
+            .btn-icon {
+                transform: scale(0.9);
+                color: $clr-orange;
+            }
+            background: $clr-white;
+        }
+    }
+}
+
+/* Modal backdrop blur effect */
+.custom-backdrop {
+    backdrop-filter: blur(5px); /* Apply a blur effect to the background */
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent dark overlay */
+}
+
+/* Custom modal styles */
+.modal-dialog {
+    position: fixed;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Center alignment */
+    width: 80%; /* Adjust width as needed */
+    max-width: 600px; /* Optional: set a max width for the modal */
+    background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent background */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1050; /* Ensures it appears above other content */
+}
+
+/* Styles for the form-like layout */
+.advanced-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Bubbles for filter options */
+.filter-option-bubble {
+    display: inline-block;
+    background-color: $clr-orange; /* Example color, change as needed */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+
+    &.active {
+        background-color: $clr-dark-orange; /* Change color when active */
+    }
+}
+
+.filter-option-bubble:hover {
+    background-color: darken($clr-orange, 10%); /* Darker shade on hover */
+}
+
+/* Horizontal layout for options */
+.options-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+}
