@@ -11,6 +11,13 @@ from users.views import (
     RecipeRetrieveUpdateDestroyView,
     FacebookLogin, 
     GoogleLogin,
+    AddSpoonacularRecipeView,
+    ServeMediaView,
+    CachedRecipeSearchView,
+    MyCookbookListCreateView,
+    MyCookbookDetailView,
+    AddRecipeToCookbookView,
+    RemoveRecipeFromCookbookView,
 )
 
 urlpatterns = [
@@ -26,7 +33,15 @@ urlpatterns = [
     path('api/delete/', UserDeleteView.as_view(), name='user-delete-view'),
     path('api/recipes/', RecipeListCreateView.as_view(), name='recipe-list-create'),
     path('api/recipes/<pk>/', RecipeRetrieveUpdateDestroyView.as_view(), name='recipe-detail'),
+    path('add-spoonacular-recipe/<int:recipe_id>/', AddSpoonacularRecipeView.as_view(), name='add_spoonacular_recipe'),
+    path('recipes/search/', CachedRecipeSearchView.as_view(), name='cached_recipe_search'),
+    path('media/<str:media_id>/', ServeMediaView.as_view(), name='serve_media'),
     path('api-token-auth/', drf_views.obtain_auth_token, name='api-token-auth'),
+    path('api/cookbooks/', MyCookbookListCreateView.as_view(), name='cookbook-list-create'),
+    path('api/cookbooks/<str:cookbook_id>/', MyCookbookDetailView.as_view(), name='cookbook-detail'),
+    path('api/cookbooks/<str:cookbook_id>/add_recipe/', AddRecipeToCookbookView.as_view(), name='add-recipe-to-cookbook'),
+    path('api/cookbooks/<str:cookbook_id>/remove_recipe/', RemoveRecipeFromCookbookView.as_view(), name='remove-recipe-from-cookbook'),
+
 ]
 
 # Set the custom 404 view
