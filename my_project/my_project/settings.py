@@ -5,12 +5,17 @@ from pymongo import MongoClient
 import gridfs
 from decouple import config
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret Key
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+# Spoonacular API Key
+SPOONACULAR_API_KEY = config('SPOONACULAR_API_KEY')
+
 
 # MongoDB Connection
 connect(
@@ -92,12 +97,14 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF middleware
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    'users.views.TokenMiddleware',
 ]
+
 
 # CSRF settings
 CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
@@ -152,4 +159,19 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+}
+
+
+# Use environment variable if available, otherwise default to relative path
+CACHE_DIR = os.environ.get('CACHE_DIR', os.path.join(BASE_DIR, 'cache'))
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': CACHE_DIR,
+        'TIMEOUT': 3600,  # Default cache timeout (1 hour)
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000  # Adjust the number of cache entries based on your needs
+        }
+    }
 }

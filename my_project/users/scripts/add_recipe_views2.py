@@ -1,23 +1,9 @@
 import requests
 import os
-import sys
 from dotenv import load_dotenv
-from mongoengine import connect
-
-# Add the project root directory to the Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-sys.path.append(project_root)
-
-from users.models import User
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Connect to MongoDB using mongoengine
-connect(
-    db=os.getenv('MONGO_DB_NAME'),
-    host=os.getenv('MONGO_DB_HOST')
-)
 
 # Sample data for the recipe
 recipe_data = {
@@ -77,42 +63,20 @@ recipe_data = {
 }
 
 # Replace these with your actual values
-api_url = 'http://localhost:8000/api/recipes/'
-auth_token = os.getenv('AUTH_TOKEN')  # Fetch the token from environment variables
+api_url = 'http://localhost:8000/api/recipes/'  # Update with your API endpoint
+auth_token = os.getenv('AUTH_TOKEN')  # Ensure this is correctly set in your .env file
 
-# Debug print to check if token is being read correctly
-print(f"Auth Token: {auth_token}")
-
-# Headers - Removed the Authorization header
+# Headers including the bearer token
 headers = {
+    "Authorization": f"token {auth_token}",
     "Content-Type": "application/json"
 }
 
-# Define the user ID
-user_id = os.getenv('USER_ID')
-
 # Test creating a recipe via the Django view
-recipe_create_url = os.getenv('RECIPE_CREATE_URL')
-cookies = {
-    'auth_token': auth_token  # Add the token to cookies
-}
-response = requests.post(recipe_create_url, json=recipe_data, headers=headers, cookies=cookies)
-
-print(f"Response Status Code: {response.status_code}")
-print(f"Response Content: {response.text}")
+response = requests.post(api_url, json=recipe_data, headers=headers)
 
 if response.status_code == 201:
-    recipe_id = response.json()['id']
+    recipe_id = response.json().get('id')
     print(f"Recipe successfully created: {recipe_id}")
-
-    # Update the User document to include the new recipe in MyPlate
-    user = User.objects(id=user_id).first()
-    if user:
-        user.my_plates.append(recipe_id)
-        user.save()
-        print(f"User updated with new recipe in MyPlate: {user.email}")
-    else:
-        print(f"User with id {user_id} not found")
-
 else:
-    print(f"Failed to create recipe: {response.text}")
+    print(f"Failed to create recipe: {response.status_code} - {response.text}")
